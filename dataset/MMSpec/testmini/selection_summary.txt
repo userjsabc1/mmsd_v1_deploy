@@ -1,0 +1,4 @@
+split	samples	requests	avg_req_time	tok/s	avg_req_tokens
+test	600	723	2.640137	73.681165	194.528
+old_testmini	60	75	3.962379	50.935731	201.827
+new_testmini_matched	60	69	2.640191	73.682627	194.536
