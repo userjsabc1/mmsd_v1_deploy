@@ -64,7 +64,7 @@ def load_textvqa(count, output_dir, seed):
     """TextVQA: image + question，图文理解。"""
     from datasets import load_dataset
     print(f"\n[TextVQA] Loading (target: {count})...")
-    ds = load_dataset("facebook/textvqa", split="train")
+    ds = load_dataset("lmms-lab/textvqa", split="train")
     indices = list(range(len(ds)))
     random.shuffle(indices)
     indices = indices[:count]
@@ -141,13 +141,12 @@ def load_gqa(count, output_dir, seed):
 
 
 def load_coco(count, output_dir, seed):
-    """COCO: image + caption → 转成 'Describe this image.' prompt。"""
+    """COCO: image + caption → 转成描述类 prompt。"""
     from datasets import load_dataset
     print(f"\n[COCO] Loading (target: {count})...")
 
-    # 用 2014_captions config, 每张图只出现一次
-    ds = load_dataset("HuggingFaceM4/COCO", "2014_captions", split="train",
-                       trust_remote_code=True)
+    # 用 lmms-lab 的 parquet 版本（val: 40.5k, test: 40.8k）
+    ds = load_dataset("lmms-lab/COCO-Caption", split="val")
     indices = list(range(len(ds)))
     random.shuffle(indices)
     indices = indices[:count]
