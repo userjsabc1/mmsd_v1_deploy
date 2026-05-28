@@ -333,7 +333,7 @@ for epoch in range(start_epoch, num_epochs):
         kwargs = {
             "input_ids": data["input_ids"].to(rank),
             "attention_mask": data["attention_mask"].to(rank),
-            "loss_mask": data["loss_mask"],
+            "loss_mask": data["loss_mask"].to(rank),
         }
         if "pixel_values" in data:
             kwargs["pixel_values"] = data["pixel_values"].to(rank)
