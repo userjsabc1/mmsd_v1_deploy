@@ -271,12 +271,23 @@ def find_max_state(directory, filename="zero_to_fp32.py"):
     if not os.path.exists(directory):
         return None, 0
     for subdir in os.listdir(directory):
-        match = re.match(r"state_(\d+)", subdir)
+        match = re.match(r"state_(\d+)$", subdir)
         if match:
             a_value = int(match.group(1))
             subdir_path = os.path.join(directory, subdir)
-            file_path = os.path.join(subdir_path, filename)
-            if os.path.isdir(subdir_path) and os.path.exists(file_path):
+            if not os.path.isdir(subdir_path):
+                continue
+            # DeepSpeed saves checkpoints in global_step* subdirectories
+            found = False
+            for inner in os.listdir(subdir_path):
+                inner_path = os.path.join(subdir_path, inner)
+                if os.path.isdir(inner_path) and os.path.exists(os.path.join(inner_path, filename)):
+                    found = True
+                    break
+            # Also check directly in state dir (fallback)
+            if not found and os.path.exists(os.path.join(subdir_path, filename)):
+                found = True
+            if found:
                 max_a = max(max_a, a_value)
     if max_a == -1:
         return None, 0
@@ -394,7 +405,7 @@ for epoch in range(start_epoch, num_epochs):
             with torch.no_grad():
                 kwargs = {"input_ids": data["input_ids"].to(rank),
                           "attention_mask": data["attention_mask"].to(rank),
-                          "loss_mask": data["loss_mask"]}
+                          "loss_mask": data["loss_mask"].to(rank)}
                 if "pixel_values" in data:
                     kwargs["pixel_values"] = data["pixel_values"].to(rank)
                 _, _, acces = model_engine(**kwargs)
